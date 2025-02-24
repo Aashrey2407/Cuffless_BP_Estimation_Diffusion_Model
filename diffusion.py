@@ -8,7 +8,7 @@ from typing import Dict, Tuple
 import neurokit2 as nk
 import torch.nn.functional as F
 from model import DiffusionUNetCrossAttention, ConditionNet
-
+#hello world
 def ddpm_schedule(beta1: float, beta2: float, T: int) -> Dict[str, torch.Tensor]:
     """
     Returns pre-computed schedule for DDPM sampling, training process.
