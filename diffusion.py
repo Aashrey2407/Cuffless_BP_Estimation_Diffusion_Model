@@ -185,6 +185,68 @@ class RDDM(nn.Module):
 
             return x_i
 
+class BPDiffusion(nn.Module):
+    def __init__(
+        self,
+        eps_model,
+        betas,
+        n_T,
+        criterion=nn.MSELoss(),
+    ):
+        super(BPDiffusion, self).__init__()
+        self.eps_model = eps_model
+        self.n_T = n_T  # Number of diffusion steps
+        self.criterion = criterion
+
+        # Compute noise schedule
+        for k, v in ddpm_schedule(betas[0], betas[1], n_T).items():
+            self.register_buffer(k, v)
+
+    def create_qrs_mask(self, patch_labels):
+        """Generate binary QRS mask `m` and its inverse `m_bar`."""
+        qrs_mask = torch.round(patch_labels)  # Binary mask for QRS regions
+        non_qrs_mask = 1 - qrs_mask  # Bitwise NOT of `m`
+        return qrs_mask, non_qrs_mask
+
+    def forward(self, x=None, cond=None, mode="train", patch_labels=None, window_size=128*4):
+        if mode == "train":
+            _ts = torch.randint(1, self.n_T, (x.shape[0],)).to(x.device)  # Sample time step (t)
+            eps = torch.randn_like(x)  # Standard Gaussian noise
+
+            qrs_mask, non_qrs_mask = self.create_qrs_mask(patch_labels)  # Get QRS and Non-QRS masks
+
+            # **First Phase: Apply noise only in QRS region (0 ≤ t < T/2)**
+            half_T = self.n_T // 2
+            x_half_T = (
+                self.sqrtab[half_T, None, None] * x  # Apply time-dependent scaling
+                + self.sqrtmab[half_T, None, None] * (qrs_mask * eps)  # Add noise only in QRS region
+            )
+
+            # **Second Phase: Apply noise only in non-QRS region (T/2 ≤ t ≤ T)**
+            x_t = (
+                self.sqrtab[_ts, None, None] * x_half_T  # Continue diffusion from x_half_T
+                + self.sqrtmab[_ts, None, None] * (non_qrs_mask * eps)  # Add noise in non-QRS region
+            )
+
+            return self.criterion(eps, self.eps_model(x_t, cond, _ts / self.n_T))
+
+        elif mode == "sample":
+            n_sample = cond["down_conditions"][-1].shape[0]
+            device = cond["down_conditions"][-1].device
+            x_i = torch.randn(n_sample, 1, window_size).to(device)  # Start with Gaussian noise
+
+            for i in range(self.n_T, 0, -1):
+                z = torch.randn(n_sample, 1, window_size).to(device) if i > 1 else 0
+                eps = self.eps_model(x_i, cond, torch.tensor(i / self.n_T).to(device).repeat(n_sample))
+
+                x_i = (
+                    self.oneover_sqrta[i] * (x_i - eps * self.mab_over_sqrtmab[i])
+                    + self.sqrt_beta_t[i] * z
+                )
+
+            return x_i
+
+
 def freeze_model(model):
 
     for param in model.parameters():
