@@ -185,62 +185,162 @@ class RDDM(nn.Module):
 
             return x_i
 
+import neurokit2 as nk
+import numpy as np
+
+def compute_alignment_loss(generated_ecg, real_ecg, sampling_rate=128):
+    """
+    Computes L_a = L_scale + L_freq, where:
+      L_scale = L_position + L_amplitude
+      L_position = average distance between R-peaks
+      L_amplitude = difference in amplitude (max-min)
+      L_freq = |N_g - N_t| (difference in # of R-peaks or BPM)
+    """
+    # 1) R-peak detection for real ECG
+    _, info_real = nk.ecg_peaks(real_ecg, sampling_rate=sampling_rate, method="pantompkins1985")
+    real_peaks = info_real["ECG_R_Peaks"]
+
+    # 2) R-peak detection for generated ECG
+    _, info_gen = nk.ecg_peaks(generated_ecg, sampling_rate=sampling_rate, method="pantompkins1985")
+    gen_peaks = info_gen["ECG_R_Peaks"]
+
+    # 3) L_position (assume same length for both signals)
+    N_min = min(len(real_peaks), len(gen_peaks))
+    if N_min > 0:
+        p_real = np.array(real_peaks[:N_min])
+        p_gen = np.array(gen_peaks[:N_min])
+        L_position = np.mean(np.abs(p_real - p_gen))
+    else:
+        L_position = 0.0
+
+    # 4) L_amplitude
+    E_t = real_ecg.max() - real_ecg.min()  # amplitude of real
+    E_g = generated_ecg.max() - generated_ecg.min()  # amplitude of generated
+    L_amplitude = abs(E_g - E_t)
+
+    # 5) L_freq
+    # heart rate difference ~ # of R-peaks difference
+    L_freq = abs(len(gen_peaks) - len(real_peaks))
+
+    # Combine them
+    L_scale = L_position + L_amplitude
+    L_a = L_scale + L_freq
+    return L_a
+
+
 class BPDiffusion(nn.Module):
     def __init__(
         self,
-        eps_model,
-        betas,
-        n_T,
+        eps_model,             # model that predicts noise
+        region_model=None,     # optional second model if needed for x_t^{[p]}
+        betas=(1e-4, 0.2),
+        n_T=1000,
+        lam1=100,              # λ1
+        lam2=1,                # λ2
         criterion=nn.MSELoss(),
+        sampling_rate=128
     ):
         super(BPDiffusion, self).__init__()
         self.eps_model = eps_model
-        self.n_T = n_T  # Number of diffusion steps
+        self.region_model = region_model  # optional if you want a separate region-based model
+        self.n_T = n_T
+        self.lam1 = lam1
+        self.lam2 = lam2
         self.criterion = criterion
+        self.sampling_rate = sampling_rate  # for alignment losses
 
-        # Compute noise schedule
-        for k, v in ddpm_schedule(betas[0], betas[1], n_T).items():
+        # Register buffers for the diffusion schedule
+        schedule = ddpm_schedule(betas[0], betas[1], n_T)
+        for k, v in schedule.items():
             self.register_buffer(k, v)
 
-    def create_qrs_mask(self, patch_labels):
-        """Generate binary QRS mask `m` and its inverse `m_bar`."""
-        qrs_mask = torch.round(patch_labels)  # Binary mask for QRS regions
-        non_qrs_mask = 1 - qrs_mask  # Bitwise NOT of `m`
-        return qrs_mask, non_qrs_mask
-
-    def forward(self, x=None, cond=None, mode="train", patch_labels=None, window_size=128*4):
+    def forward(self, x=None, cond=None, mode="train", patch_labels=None):
+        """
+        x: (batch, channels=1, length) - real ECG
+        cond: dictionary of conditioning features
+        patch_labels: QRS mask (binary)
+        mode: 'train' or 'sample'
+        """
         if mode == "train":
-            _ts = torch.randint(1, self.n_T, (x.shape[0],)).to(x.device)  # Sample time step (t)
-            eps = torch.randn_like(x)  # Standard Gaussian noise
+            # 1) Sample a random time step
+            _ts = torch.randint(1, self.n_T, (x.shape[0],)).to(x.device)  # shape: (batch,)
 
-            qrs_mask, non_qrs_mask = self.create_qrs_mask(patch_labels)  # Get QRS and Non-QRS masks
+            # 2) Generate Gaussian noise
+            eps = torch.randn_like(x)  # same shape as x
 
-            # **First Phase: Apply noise only in QRS region (0 ≤ t < T/2)**
+            # 3) Create QRS mask and non-QRS mask
+            qrs_mask = torch.round(patch_labels)  # shape: same as x
+            non_qrs_mask = 1.0 - qrs_mask
+
+            # PHASE 1: (0 ≤ t < T/2) Noise in QRS region
             half_T = self.n_T // 2
-            x_half_T = (
-                self.sqrtab[half_T, None, None] * x  # Apply time-dependent scaling
-                + self.sqrtmab[half_T, None, None] * (qrs_mask * eps)  # Add noise only in QRS region
+            x_half = (
+                self.sqrtab[half_T, None, None] * x
+                + self.sqrtmab[half_T, None, None] * (qrs_mask * eps)
             )
 
-            # **Second Phase: Apply noise only in non-QRS region (T/2 ≤ t ≤ T)**
+            # PHASE 2: (T/2 ≤ t ≤ T) Noise in non-QRS region
             x_t = (
-                self.sqrtab[_ts, None, None] * x_half_T  # Continue diffusion from x_half_T
-                + self.sqrtmab[_ts, None, None] * (non_qrs_mask * eps)  # Add noise in non-QRS region
+                self.sqrtab[_ts, None, None] * x_half
+                + self.sqrtmab[_ts, None, None] * (non_qrs_mask * eps)
             )
 
-            return self.criterion(eps, self.eps_model(x_t, cond, _ts / self.n_T))
+            # 4) Noise Prediction (first part of L_q)
+            pred_noise = self.eps_model(x_t, cond, _ts / self.n_T)  # shape: same as x
+            # Compare predicted noise in QRS region with actual noise in QRS
+            l_q_part1 = self.criterion(qrs_mask * eps, qrs_mask * pred_noise)  # MSE in QRS region
+
+            # 5) If region_model is used to get x_t^{[p]}, do so:
+            #    (this is optional if you want a second model to reconstruct or partial denoise)
+            if self.region_model is not None:
+                x_t_pred = self.region_model(x_t, cond, _ts / self.n_T)  # x_t^{[p]}
+                # second part: (x_T - x_t) - x_t^{[p]} => we approximate x_T ~ x (the real ECG)
+                l_q_part2 = self.criterion((x - x_t), x_t_pred)
+            else:
+                # if no region_model, fallback to 0 for second part
+                l_q_part2 = 0.0
+
+            # Full L_q from the paper:
+            L_q = self.lam1 * l_q_part1 + self.lam2 * l_q_part2
+
+            # 6) Alignment Loss (L_a)
+            # We can treat x_t as a "generated" ECG sample. Or, you might want a separate reverse pass.
+            # For demonstration, let's compute alignment vs. real ECG:
+            # Convert x, x_t to CPU numpy for neurokit2
+            # shape: (batch, 1, length)
+            # We'll do a batch average for alignment
+            L_a = 0.0
+            x_t_np = x_t.detach().cpu().numpy()
+            x_np = x.detach().cpu().numpy()
+
+            batch_size = x.shape[0]
+            for b in range(batch_size):
+                gen_ecg = x_t_np[b, 0, :]  # single ECG
+                real_ecg = x_np[b, 0, :]
+                L_a_single = compute_alignment_loss(gen_ecg, real_ecg, sampling_rate=self.sampling_rate)
+                L_a += L_a_single
+            L_a = L_a / batch_size  # average alignment loss over batch
+
+            # Final Loss: L_q + L_a
+            total_loss = L_q + L_a
+
+            return total_loss, L_q, L_a
 
         elif mode == "sample":
+            # Reverse diffusion sampling from noise to ECG
+            # This code is standard DDPM sampling; you could adapt for 2-phase if desired
             n_sample = cond["down_conditions"][-1].shape[0]
             device = cond["down_conditions"][-1].device
-            x_i = torch.randn(n_sample, 1, window_size).to(device)  # Start with Gaussian noise
+            window_size = x.shape[-1] if x is not None else 512
+
+            x_i = torch.randn(n_sample, 1, window_size).to(device)
 
             for i in range(self.n_T, 0, -1):
                 z = torch.randn(n_sample, 1, window_size).to(device) if i > 1 else 0
-                eps = self.eps_model(x_i, cond, torch.tensor(i / self.n_T).to(device).repeat(n_sample))
+                pred_noise = self.eps_model(x_i, cond, torch.tensor(i / self.n_T).to(device).repeat(n_sample))
 
                 x_i = (
-                    self.oneover_sqrta[i] * (x_i - eps * self.mab_over_sqrtmab[i])
+                    self.oneover_sqrta[i] * (x_i - pred_noise * self.mab_over_sqrtmab[i])
                     + self.sqrt_beta_t[i] * z
                 )
 
