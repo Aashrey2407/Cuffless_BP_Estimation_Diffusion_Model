@@ -7,6 +7,7 @@ warnings.filterwarnings("ignore")
 import numpy as np
 from model import DiffusionUNetCrossAttention, ConditionNet
 from diffusion import BPDiffusion  # Changed from RDDM to BPDiffusion
+from diffusion import BP_Estimator
 from data import get_datasets
 import torch.nn as nn
 from metrics import *
@@ -56,6 +57,9 @@ def train_bp_diffusion(config):
         sampling_rate=128
     ).to(device)
 
+    bp_estimator = BP_Estimator(input_dim = 2,hidden_state = 128,num_layers = 2,output_dim = 2,dropout = 0.2).to(device)
+
+
     # Use a single ConditionNet instance for unified conditioning
     Conditioning_network = ConditionNet().to(device)
     
@@ -67,7 +71,7 @@ def train_bp_diffusion(config):
 
     bp_diffusion = nn.DataParallel(bp_diffusion)
     Conditioning_network = nn.DataParallel(Conditioning_network)
-
+    bp_estimator = nn.DataParallel(bp_estimator)
     scheduler = CosineAnnealingLRWarmup(optim, T_max=1000, T_warmup=20)
     
     for i in range(n_epoch):
@@ -76,19 +80,23 @@ def train_bp_diffusion(config):
         Conditioning_network.train()
         pbar = tqdm(dataloader)
 
-        for y_ecg, x_ppg, ecg_roi in pbar:
+        for y_ecg, x_ppg, ecg_roi,bp_target in pbar:
             optim.zero_grad()
             x_ppg = x_ppg.float().to(device)
             y_ecg = y_ecg.float().to(device)
             ecg_roi = ecg_roi.float().to(device)
-
+            bp_target = bp_target.float().to(device)
             # Get unified conditioning from the PPG signal
             ppg_conditions = Conditioning_network(x_ppg, drop_prob=cond_mask)
 
             # Forward pass with BPDiffusion; it returns (total_loss, L_q, L_a)
             total_loss, L_q, L_a = bp_diffusion(x=y_ecg, cond=ppg_conditions, patch_labels=ecg_roi, mode="train")
-            
-            total_loss.mean().backward()
+            gen_ecg = bp_diffusion(x=y_ecg,cond=ppg_conditions,patch_labels = ecg_roi,mode = "train")
+
+            bp_pred,L_bp = bp_estimator(gen_ecg,x_ppg,bp_target)
+            overall_loss = total_loss + L_bp
+
+            overall_loss.mean().backward()
             optim.step()
 
             pbar.set_description(f"Total Loss: {total_loss.mean().item():.4f}, L_q: {L_q.mean().item():.4f}, L_a: {L_a:.4f}")
