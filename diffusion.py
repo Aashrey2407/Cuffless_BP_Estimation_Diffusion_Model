@@ -429,7 +429,7 @@ class BP_Estimator(nn.Module):
         :return: If bp_target is provided, returns (bp_pred, loss); else returns bp_pred.
         """
         #input to bilstm is generated ecg and original ppg
-        x = torch.cat([generated_ecg,original_ppg],dimension = 1)
+        x = torch.cat([generated_ecg,original_ppg],dim = 1)
         #transposing from (2,T) to (T,2) so that time is the sequence domain
         x = x.transpose(1,2)
         #pass input into the bilstm
@@ -442,7 +442,7 @@ class BP_Estimator(nn.Module):
         h_cat = torch.cat((h_forward,h_backward),dim = 1)
         bp_pred = self.fc(h_cat)
 
-        if bp_pred is not None:
+        if bp_target is not None:
             L_bp = self.loss_fn(bp_pred,bp_target)
             return bp_pred,L_bp
         
