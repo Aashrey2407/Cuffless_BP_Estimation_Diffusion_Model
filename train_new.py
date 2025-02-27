@@ -57,7 +57,7 @@ def train_bp_diffusion(config):
         sampling_rate=128
     ).to(device)
 
-    bp_estimator = BP_Estimator(input_dim = 2,hidden_state = 128,num_layers = 2,output_dim = 2,dropout = 0.2).to(device)
+    bp_estimator = BP_Estimator(input_dim = 2,hidden_size = 128,num_layers = 2,output_dim = 2,dropout = 0.2).to(device)
 
 
     # Use a single ConditionNet instance for unified conditioning
@@ -66,7 +66,7 @@ def train_bp_diffusion(config):
     bp_diffusion.to(device)
 
     optim = torch.optim.AdamW(
-        [*bp_diffusion.parameters(), *Conditioning_network.parameters()], lr=1e-4
+        [*bp_diffusion.parameters(), *Conditioning_network.parameters(), *bp_estimator.parameters()], lr=1e-4
     )
 
     bp_diffusion = nn.DataParallel(bp_diffusion)
@@ -78,6 +78,7 @@ def train_bp_diffusion(config):
         print(f"\n****************** Epoch - {i} *******************\n")
         bp_diffusion.train()
         Conditioning_network.train()
+        bp_estimator.train()
         pbar = tqdm(dataloader)
 
         for y_ecg, x_ppg, ecg_roi,bp_target in pbar:
@@ -91,7 +92,7 @@ def train_bp_diffusion(config):
 
             # Forward pass with BPDiffusion; it returns (total_loss, L_q, L_a)
             total_loss, L_q, L_a = bp_diffusion(x=y_ecg, cond=ppg_conditions, patch_labels=ecg_roi, mode="train")
-            gen_ecg = bp_diffusion(x=y_ecg,cond=ppg_conditions,patch_labels = ecg_roi,mode = "train")
+            gen_ecg = bp_diffusion(x=y_ecg,cond=ppg_conditions,patch_labels = ecg_roi,mode = "sample")
 
             bp_pred,L_bp = bp_estimator(gen_ecg,x_ppg,bp_target)
             overall_loss = total_loss + L_bp
@@ -99,12 +100,13 @@ def train_bp_diffusion(config):
             overall_loss.mean().backward()
             optim.step()
 
-            pbar.set_description(f"Total Loss: {total_loss.mean().item():.4f}, L_q: {L_q.mean().item():.4f}, L_a: {L_a:.4f}")
+            pbar.set_description(f"Total Loss: {overall_loss.mean().item():.4f}, L_q: {L_q.mean().item():.4f}, L_a: {L_a:.4f},L_bp: {L_bp.mean().item():.4f}")
 
             wandb.log({
-                "Total_loss": total_loss.mean().item(),
+                "Overall_loss": overall_loss.mean().item(),
                 "L_q": L_q.mean().item(),
                 "L_a": L_a,
+                "L_bp": L_bp.mean().item(),
             })
 
         scheduler.step()
@@ -112,6 +114,7 @@ def train_bp_diffusion(config):
         if i % 80 == 0:
             torch.save(bp_diffusion.module.state_dict(), f"{PATH}/BPDiffusion_epoch{i}.pth")
             torch.save(Conditioning_network.module.state_dict(), f"{PATH}/ConditionNet_epoch{i}.pth")
+            torch.save(bp_estimator.module.state_dict(), f"{PATH}/BP_Estimator_epoch{i}.pth")
 
 if __name__ == "__main__":
     config = {
