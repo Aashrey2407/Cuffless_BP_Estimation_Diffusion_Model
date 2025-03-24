@@ -3,13 +3,11 @@ import time
 import sys
 sys.setrecursionlimit(3000)
 import torch
-import similaritymeasures
 import numpy as np
 import neurokit2 as nk
 from biosppy.signals import ecg as ecg_func
 from biosppy.signals import tools as tools
 import neurokit2.ppg as ppg_func
-from torchmetrics.functional import pearson_corrcoef
 
 def fid_features_to_statistics(features):
     assert torch.is_tensor(features) and features.dim() == 2
