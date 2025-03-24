@@ -50,7 +50,11 @@ def train_rddm(config):
         config=config
     )
 
-    dataset_train, _ = get_datasets()
+    dataset_train, dataset_test = get_datasets(
+    DATA_PATH="./",  # Path where preprocessed_mimic directory is located
+    datasets=["preprocessed_mimic"],  # Use your preprocessed dataset
+    window_size=4
+)
 
     dataloader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=128)
 
