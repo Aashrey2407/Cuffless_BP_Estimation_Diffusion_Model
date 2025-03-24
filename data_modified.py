@@ -108,7 +108,5 @@ def get_datasets_physionet(data_dir, record_list, window_size=500):
     dataset = ECGDataset(ecg_data, ppg_data)
     return dataset
 
-# Example usage:
-# data_dir = "/path/to/physionet/records"
-# record_list = ["3141595_0001"]  # List of record names (without file extensions)
-# dataset = get_datasets_physionet(data_dir, record_list)
+
+

@@ -8,11 +8,44 @@ import numpy as np
 from model import DiffusionUNetCrossAttention, ConditionNet
 from diffusion import BPDiffusion  # Changed from RDDM to BPDiffusion
 from diffusion import BP_Estimator
-from data import get_datasets
+from data_modified import get_datasets_physionet
 import torch.nn as nn
 from metrics import *
-from lr_scheduler import CosineAnnealingLRWarmup
+# from torch.optim.lr_scheduler import CosineAnnealingLRWarmup
 from torch.utils.data import Dataset, DataLoader
+
+class CosineAnnealingLRWarmup:
+    def __init__(self, optimizer, T_max, T_warmup, eta_min=0):
+        self.optimizer = optimizer
+        self.T_max = T_max
+        self.T_warmup = T_warmup
+        self.eta_min = eta_min
+        self.warmup_scheduler = torch.optim.lr_scheduler.LambdaLR(
+            optimizer, 
+            lr_lambda=lambda step: min(1.0, step / T_warmup)
+        )
+        self.cosine_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, 
+            T_max=T_max - T_warmup,
+            eta_min=eta_min
+        )
+        self.current_step = 0
+
+    def step(self):
+        if self.current_step < self.T_warmup:
+            self.warmup_scheduler.step()
+        else:
+            # Adjust step count for the cosine scheduler to start from zero after warmup
+            self.cosine_scheduler.step(self.current_step - self.T_warmup)
+        self.current_step += 1
+
+    def get_last_lr(self):
+        if self.current_step < self.T_warmup:
+            return self.warmup_scheduler.get_last_lr()
+        else:
+            return self.cosine_scheduler.get_last_lr()
+
+
 
 def set_deterministic(seed):
     if seed is not None:
@@ -25,7 +58,7 @@ def set_deterministic(seed):
         torch.backends.cudnn.benchmark = False 
         warnings.warn('Seeding training. This will turn on deterministic settings which may slow down training.')
 
-set_deterministic(31)
+
 
 def train_bp_diffusion(config):
     n_epoch = config["n_epoch"]
@@ -42,10 +75,14 @@ def train_bp_diffusion(config):
         id=f"INSERT ID HERE",
         config=config
     )
+    
+    data_dir = "./patient"
+    record_list = ["3141595_0001"]  # List of record names (without file extensions)
+    dataset_train = get_datasets_physionet(data_dir, record_list)
 
-    dataset_train, _ = get_datasets()
+    dataloader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=4)
 
-    dataloader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=128)
+    print(dataloader)
 
     # Instantiate the new BPDiffusion model
     bp_diffusion = BPDiffusion(
@@ -72,7 +109,7 @@ def train_bp_diffusion(config):
     bp_diffusion = nn.DataParallel(bp_diffusion)
     Conditioning_network = nn.DataParallel(Conditioning_network)
     bp_estimator = nn.DataParallel(bp_estimator)
-    scheduler = CosineAnnealingLRWarmup(optim, T_max=1000, T_warmup=20)
+    scheduler = CosineAnnealingLRWarmup(optim, T_max=1000,T_warmup=20,eta_min=1e-6)
     
     for i in range(n_epoch):
         print(f"\n****************** Epoch - {i} *******************\n")
@@ -121,11 +158,11 @@ if __name__ == "__main__":
         "n_epoch": 1000,
         "batch_size": 128*4,
         "nT": 10,
-        "device": "cuda",
+        "device": "cpu",
         "attention_heads": 8,
         "cond_mask": 0.0,
         "lam1": 100,   # Weight for QRS region noise loss
         "lam2": 1,     # Weight for reconstruction loss (if region_model is used)
-        "PATH": "INSERT PATH HERE"
+        "PATH": "./"
     }
     train_bp_diffusion(config)
