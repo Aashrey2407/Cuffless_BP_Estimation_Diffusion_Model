@@ -1,0 +1,14 @@
+{"time":"2025-03-20T13:48:18.737172+05:30","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/Users/Venkatesh/Documents/Diffusion_model/wandb/offline-run-20250320_134818-INSERT ID HERE/logs/debug-core.log"}
+{"time":"2025-03-20T13:48:18.842892+05:30","level":"INFO","msg":"created new stream","id":"INSERT ID HERE"}
+{"time":"2025-03-20T13:48:18.842939+05:30","level":"INFO","msg":"stream: started","id":"INSERT ID HERE"}
+{"time":"2025-03-20T13:48:18.842959+05:30","level":"INFO","msg":"writer: Do: started","stream_id":"INSERT ID HERE"}
+{"time":"2025-03-20T13:48:18.842981+05:30","level":"INFO","msg":"sender: started","stream_id":"INSERT ID HERE"}
+{"time":"2025-03-20T13:48:18.843021+05:30","level":"INFO","msg":"handler: started","stream_id":"INSERT ID HERE"}
+{"time":"2025-03-20T13:48:18.846695+05:30","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-03-20T13:49:10.005884+05:30","level":"INFO","msg":"stream: closing","id":"INSERT ID HERE"}
+{"time":"2025-03-20T13:49:10.026836+05:30","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-03-20T13:49:10.080844+05:30","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-03-20T13:49:10.081175+05:30","level":"INFO","msg":"handler: closed","stream_id":"INSERT ID HERE"}
+{"time":"2025-03-20T13:49:10.081215+05:30","level":"INFO","msg":"writer: Close: closed","stream_id":"INSERT ID HERE"}
+{"time":"2025-03-20T13:49:10.081231+05:30","level":"INFO","msg":"sender: closed","stream_id":"INSERT ID HERE"}
+{"time":"2025-03-20T13:49:10.096167+05:30","level":"INFO","msg":"stream: closed","id":"INSERT ID HERE"}

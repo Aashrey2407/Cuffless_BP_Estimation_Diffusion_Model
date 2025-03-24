@@ -1,0 +1,7 @@
+{"time":"2025-03-20T14:13:51.843027+05:30","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/Users/Venkatesh/Documents/Diffusion_model/wandb/offline-run-20250320_141351-INSERT ID HERE/logs/debug-core.log"}
+{"time":"2025-03-20T14:13:51.952629+05:30","level":"INFO","msg":"created new stream","id":"INSERT ID HERE"}
+{"time":"2025-03-20T14:13:51.95282+05:30","level":"INFO","msg":"stream: started","id":"INSERT ID HERE"}
+{"time":"2025-03-20T14:13:51.953019+05:30","level":"INFO","msg":"handler: started","stream_id":"INSERT ID HERE"}
+{"time":"2025-03-20T14:13:51.953035+05:30","level":"INFO","msg":"writer: Do: started","stream_id":"INSERT ID HERE"}
+{"time":"2025-03-20T14:13:51.95318+05:30","level":"INFO","msg":"sender: started","stream_id":"INSERT ID HERE"}
+{"time":"2025-03-20T14:13:51.9571+05:30","level":"INFO","msg":"Starting system monitor"}

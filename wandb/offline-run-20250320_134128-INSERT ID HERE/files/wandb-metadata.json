@@ -1,0 +1,43 @@
+{
+  "os": "macOS-14.5-arm64-arm-64bit",
+  "python": "CPython 3.11.7",
+  "startedAt": "2025-03-20T08:11:28.415355Z",
+  "program": "/Users/Venkatesh/Documents/Diffusion_model/train_new.py",
+  "codePath": "train_new.py",
+  "git": {
+    "remote": "https://github.com/Aashrey2407/Cuffless_BP_Estimation_Diffusion_Model.git",
+    "commit": "423635585cba5be7b2770592107734466ca61a81"
+  },
+  "root": "/Users/Venkatesh/Documents/Diffusion_model",
+  "host": "Aashreys-MacBook.local",
+  "executable": "/opt/anaconda3/bin/python",
+  "codePathLocal": "train_new.py",
+  "cpu_count": 8,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "270062637056"
+    },
+    "/System/Volumes/Data": {
+      "total": "494384795648",
+      "used": "270062637056"
+    }
+  },
+  "memory": {
+    "total": "17179869184"
+  },
+  "cpu": {
+    "count": 8,
+    "countLogical": 8
+  },
+  "apple": {
+    "name": "Apple M1 Pro",
+    "ecpuCores": 2,
+    "pcpuCores": 6,
+    "gpuCores": 14,
+    "memoryGb": 16,
+    "swapTotalBytes": "2147483648",
+    "ramTotalBytes": "17179869184"
+  }
+}

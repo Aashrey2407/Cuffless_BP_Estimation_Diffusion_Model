@@ -66,7 +66,7 @@ def train_rddm(config):
     rddm.to(device)
 
     optim = torch.optim.AdamW([*rddm.parameters(), *Conditioning_network1.parameters(), *Conditioning_network2.parameters()], lr=1e-4)
-
+    
     rddm = nn.DataParallel(rddm)
     Conditioning_network1 = nn.DataParallel(Conditioning_network1)
     Conditioning_network2 = nn.DataParallel(Conditioning_network2)

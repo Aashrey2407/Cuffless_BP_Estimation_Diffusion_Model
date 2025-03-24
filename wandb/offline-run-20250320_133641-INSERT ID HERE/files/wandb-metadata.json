@@ -1,0 +1,15 @@
+{
+  "os": "macOS-14.5-arm64-arm-64bit",
+  "python": "CPython 3.11.7",
+  "startedAt": "2025-03-20T08:06:41.318354Z",
+  "program": "/Users/Venkatesh/Documents/Diffusion_model/train_new.py",
+  "codePath": "train_new.py",
+  "git": {
+    "remote": "https://github.com/Aashrey2407/Cuffless_BP_Estimation_Diffusion_Model.git",
+    "commit": "423635585cba5be7b2770592107734466ca61a81"
+  },
+  "root": "/Users/Venkatesh/Documents/Diffusion_model",
+  "host": "Aashreys-MacBook.local",
+  "executable": "/opt/anaconda3/bin/python",
+  "codePathLocal": "train_new.py"
+}
