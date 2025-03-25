@@ -86,8 +86,7 @@ def create_dataset(record_paths, output_dir, window_size=4, train_split=0.8):
 if __name__ == "__main__":
     # List your .dat files (without extension)
     record_paths = [
-        "path/to/3141595_0001",
-        "path/to/3141595_0002",
+        "/scratch/bhanu/cuffless_bp/3141595/3141595_0001",
     ]
     
     output_dir = "preprocessed_mimic"

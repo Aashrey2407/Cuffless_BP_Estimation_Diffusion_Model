@@ -43,12 +43,12 @@ def train_rddm(config):
     alpha2 = config["alpha2"]
     PATH = config["PATH"]
 
-    wandb.init(
-        project="INSERT PROJECT NAME HERE",
-        entity="INSERT ENTITY HERE",
-        id=f"INSERT ID HERE",
-        config=config
-    )
+#    wandb.init(
+ #       project="INSERT PROJECT NAME HERE",
+  #      entity="INSERT ENTITY HERE",
+   #     id=f"INSERT ID HERE",
+    #    config=config
+   # )
 
     dataset_train, dataset_test = get_datasets(
     DATA_PATH="./",  # Path where preprocessed_mimic directory is located
@@ -92,8 +92,8 @@ def train_rddm(config):
             y_ecg = y_ecg.float().to(device)
             ecg_roi = ecg_roi.float().to(device)
 
-            ppg_conditions1 = Conditioning_network1(x_ppg, drop_prob=cond_mask)
-            ppg_conditions2 = Conditioning_network2(x_ppg, drop_prob=cond_mask)
+            ppg_conditions1 = Conditioning_network1(x_ppg)
+            ppg_conditions2 = Conditioning_network2(x_ppg)
 
             ddpm_loss, region_loss = rddm(x=y_ecg, cond1=ppg_conditions1, cond2=ppg_conditions2, patch_labels=ecg_roi)
 
@@ -125,9 +125,9 @@ if __name__ == "__main__":
 
     config = {
         "n_epoch": 1000,
-        "batch_size": 128*4,
+        "batch_size":125*4,
         "nT":10,
-        "device": "cuda",
+        "device": "cpu",
         "attention_heads": 8,
         "cond_mask": 0.0,
         "alpha1": 100,
