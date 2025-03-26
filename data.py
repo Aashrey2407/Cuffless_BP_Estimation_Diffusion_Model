@@ -36,11 +36,7 @@ class ECGDataset(Dataset):
     def __len__(self):
         return len(self.ecg_data)
 
-def get_datasets(
-    DATA_PATH = "../../ingenuity_NAS/21ds94_nas/21ds94_mount/AAAI24/datasets/", 
-    datasets=["BIDMC", "CAPNO", "DALIA", "MIMIC-AFib", "WESAD"],
-    window_size=4,
-    ):
+def get_datasets(DATA_PATH = "../../ingenuity_NAS/21ds94_nas/21ds94_mount/AAAI24/datasets/",  datasets=["BIDMC", "CAPNO", "DALIA", "MIMIC-AFib", "WESAD"],window_size=4,):
 
     ecg_train_list = []
     ppg_train_list = []

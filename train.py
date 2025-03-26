@@ -31,7 +31,7 @@ def set_deterministic(seed):
 
 set_deterministic(31)
 
-def train_rddm(config):
+def train_rddm(config, resume_from_epoch=800):
 
     n_epoch = config["n_epoch"]
     device = config["device"]
@@ -43,12 +43,14 @@ def train_rddm(config):
     alpha2 = config["alpha2"]
     PATH = config["PATH"]
 
-#    wandb.init(
- #       project="INSERT PROJECT NAME HERE",
-  #      entity="INSERT ENTITY HERE",
-   #     id=f"INSERT ID HERE",
-    #    config=config
-   # )
+    wandb.init(
+        project="Cuffless_BP",
+        name=f"RDDM_training_resumed_from_epoch_{resume_from_epoch}",
+        entity="switchblade-bits-pilani",
+        id=None,
+        resume="allow",  # This allows resuming if the run ID already exists
+        config=config
+    )
 
     dataset_train, dataset_test = get_datasets(
     DATA_PATH="./",  # Path where preprocessed_mimic directory is located
@@ -69,6 +71,14 @@ def train_rddm(config):
     Conditioning_network2 = ConditionNet().to(device)
     rddm.to(device)
 
+    if resume_from_epoch > 0:
+        print(f"Loading checkpoints from epoch {resume_from_epoch}")
+        rddm.load_state_dict(torch.load(f"{PATH}/RDDM_epoch{resume_from_epoch}.pth"))
+        Conditioning_network1.load_state_dict(torch.load(f"{PATH}/ConditionNet1_epoch{resume_from_epoch}.pth"))
+        Conditioning_network2.load_state_dict(torch.load(f"{PATH}/ConditionNet2_epoch{resume_from_epoch}.pth"))
+
+
+
     optim = torch.optim.AdamW([*rddm.parameters(), *Conditioning_network1.parameters(), *Conditioning_network2.parameters()], lr=1e-4)
 
     rddm = nn.DataParallel(rddm)
@@ -76,7 +86,9 @@ def train_rddm(config):
     Conditioning_network2 = nn.DataParallel(Conditioning_network2)
 
     scheduler = CosineAnnealingLRWarmup(optim, T_max=1000, T_warmup=20)
-    for i in range(n_epoch):
+    for j in range(resume_from_epoch):
+        scheduler.step()
+    for i in range(j+1,n_epoch):
         print(f"\n****************** Epoch - {i} *******************\n\n")
 
         rddm.train()
@@ -108,31 +120,43 @@ def train_rddm(config):
 
             pbar.set_description(f"loss: {loss.mean().item():.4f}")
 
+            # In your training loop, after calculating losses
             wandb.log({
+                "epoch": i,
+                "loss": loss.mean().item(),
                 "DDPM_loss": ddpm_loss.mean().item(),
                 "Region_loss": region_loss.mean().item(),
-            })
+                "learning_rate": scheduler.get_last_lr()[0]
+            }, step=i)
 
         scheduler.step()
-
+        # Add this after your training loop for each epoch
+        if i % 5 == 0:  # Every 10 epochs
+                # Log example predictions if applicable
+            wandb.log({
+                "epoch_completed": i,
+                "epochs_remaining": n_epoch - i
+            })
         if i % 80 == 0:
             torch.save(rddm.module.state_dict(), f"{PATH}/RDDM_epoch{i}.pth")
             torch.save(Conditioning_network1.module.state_dict(), f"{PATH}/ConditionNet1_epoch{i}.pth")
             torch.save(Conditioning_network2.module.state_dict(), f"{PATH}/ConditionNet2_epoch{i}.pth")
+            wandb.save(f"{PATH}/RDDM_epoch{i}.pth")
+            wandb.log({"checkpoint_epoch": i})
 
                 
 if __name__ == "__main__":
 
     config = {
         "n_epoch": 1000,
-        "batch_size":125*4,
+        "batch_size":32,
         "nT":10,
-        "device": "cpu",
+        "device": "cuda",
         "attention_heads": 8,
         "cond_mask": 0.0,
         "alpha1": 100,
         "alpha2": 1,
-        "PATH": "INSERT PATH HERE"
+        "PATH": "./"
     }
 
-    train_rddm(config)
+    train_rddm(config, resume_from_epoch=800)
