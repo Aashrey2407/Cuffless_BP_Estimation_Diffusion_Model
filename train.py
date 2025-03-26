@@ -7,7 +7,7 @@ warnings.filterwarnings("ignore")
 import numpy as np
 from model import DiffusionUNetCrossAttention, ConditionNet
 from diffusion import RDDM
-from data import get_datasets
+from data_pradyum import get_datasets
 import torch.nn as nn
 from metrics import *
 from lr_scheduler import CosineAnnealingLRWarmup
@@ -53,9 +53,8 @@ def train_rddm(config, resume_from_epoch=800):
     )
 
     dataset_train, dataset_test = get_datasets(
-    DATA_PATH="./",  # Path where preprocessed_mimic directory is located
-    datasets=["preprocessed_mimic"],  # Use your preprocessed dataset
-    window_size=4
+    DATA_PATH="./preprocessed_mimic",  # Path where preprocessed_mimic directory is located
+    window_size=10
 )
 
     dataloader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=128)
