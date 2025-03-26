@@ -87,7 +87,7 @@ def train_rddm(config, resume_from_epoch=800):
     scheduler = CosineAnnealingLRWarmup(optim, T_max=1000, T_warmup=20)
     for j in range(resume_from_epoch):
         scheduler.step()
-    for i in range(j+1,n_epoch):
+    for i in range(0,n_epoch):
         print(f"\n****************** Epoch - {i} *******************\n\n")
 
         rddm.train()
@@ -158,4 +158,4 @@ if __name__ == "__main__":
         "PATH": "./"
     }
 
-    train_rddm(config, resume_from_epoch=800)
+    train_rddm(config, resume_from_epoch=0)

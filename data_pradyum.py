@@ -48,6 +48,15 @@ def get_datasets(DATA_PATH,window_size):
     ppg_train = np.load(DATA_PATH + f"/ppg_train_{window_size}sec.npy", allow_pickle=True).reshape(-1, 125*window_size)   
     ecg_test = np.load(DATA_PATH + f"/ecg_test_{window_size}sec.npy", allow_pickle=True).reshape(-1, 125*window_size)
     ppg_test = np.load(DATA_PATH + f"/ppg_test_{window_size}sec.npy", allow_pickle=True).reshape(-1, 125*window_size)
+    
+    padding_size = 30
+
+    ecg_train = np.pad(ecg_train, ((0, 0), (0, padding_size)), mode='constant')
+    ppg_train = np.pad(ppg_train, ((0, 0), (0, padding_size)), mode='constant')
+
+    ecg_test = np.pad(ecg_test, ((0, 0), (0, padding_size)), mode='constant')
+    ppg_test = np.pad(ppg_test, ((0, 0), (0, padding_size)), mode='constant')
+
 
     ecg_train = np.nan_to_num(ecg_train.astype("float32"))
     ppg_train = np.nan_to_num(ppg_train.astype("float32"))
