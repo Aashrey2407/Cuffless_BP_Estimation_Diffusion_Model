@@ -13,6 +13,10 @@ from metrics import *
 from lr_scheduler import CosineAnnealingLRWarmup
 from torch.utils.data import Dataset, DataLoader
 
+import os
+# Configure PyTorch memory management
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:128'
+
 def set_deterministic(seed):
     # seed by default is None 
     if seed is not None:
@@ -148,7 +152,7 @@ if __name__ == "__main__":
 
     config = {
         "n_epoch": 1000,
-        "batch_size":32,
+        "batch_size":2,
         "nT":10,
         "device": "cuda",
         "attention_heads": 8,
