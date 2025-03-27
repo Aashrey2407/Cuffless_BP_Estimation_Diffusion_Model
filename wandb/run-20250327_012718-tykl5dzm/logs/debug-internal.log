@@ -1,0 +1,184 @@
+2025-03-27 01:27:18,683 INFO    StreamThr :1943268 [internal.py:wandb_internal():86] W&B internal server running at pid: 1943268, started at: 2025-03-27 01:27:18.682211
+2025-03-27 01:27:18,686 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: status
+2025-03-27 01:27:18,690 INFO    WriterThread:1943268 [datastore.py:open_for_write():85] open: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/run-tykl5dzm.wandb
+2025-03-27 01:27:18,692 DEBUG   SenderThread:1943268 [sender.py:send():379] send: header
+2025-03-27 01:27:18,717 DEBUG   SenderThread:1943268 [sender.py:send():379] send: run
+2025-03-27 01:27:18,722 INFO    SenderThread:1943268 [sender.py:_maybe_setup_resume():758] checking resume status for switchblade-bits-pilani/Cuffless_BP/tykl5dzm
+2025-03-27 01:27:19,792 INFO    SenderThread:1943268 [dir_watcher.py:__init__():211] watching files in: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files
+2025-03-27 01:27:19,792 INFO    SenderThread:1943268 [sender.py:_start_run_threads():1121] run started: tykl5dzm with start time 1743019038.683249
+2025-03-27 01:27:19,801 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: check_version
+2025-03-27 01:27:19,801 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: check_version
+2025-03-27 01:27:19,910 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: run_start
+2025-03-27 01:27:19,913 DEBUG   HandlerThread:1943268 [system_info.py:__init__():32] System info init
+2025-03-27 01:27:19,913 DEBUG   HandlerThread:1943268 [system_info.py:__init__():47] System info init done
+2025-03-27 01:27:19,913 INFO    HandlerThread:1943268 [system_monitor.py:start():181] Starting system monitor
+2025-03-27 01:27:19,913 INFO    SystemMonitor:1943268 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2025-03-27 01:27:19,914 INFO    HandlerThread:1943268 [system_monitor.py:probe():201] Collecting system info
+2025-03-27 01:27:19,915 INFO    SystemMonitor:1943268 [interfaces.py:start():190] Started cpu monitoring
+2025-03-27 01:27:19,915 INFO    SystemMonitor:1943268 [interfaces.py:start():190] Started disk monitoring
+2025-03-27 01:27:19,916 INFO    SystemMonitor:1943268 [interfaces.py:start():190] Started memory monitoring
+2025-03-27 01:27:19,917 INFO    SystemMonitor:1943268 [interfaces.py:start():190] Started network monitoring
+2025-03-27 01:27:19,941 DEBUG   HandlerThread:1943268 [system_info.py:probe():196] Probing system
+2025-03-27 01:27:19,949 DEBUG   HandlerThread:1943268 [system_info.py:_probe_git():181] Probing git
+2025-03-27 01:27:19,968 DEBUG   HandlerThread:1943268 [system_info.py:_probe_git():189] Probing git done
+2025-03-27 01:27:19,968 DEBUG   HandlerThread:1943268 [system_info.py:probe():244] Probing system done
+2025-03-27 01:27:19,969 DEBUG   HandlerThread:1943268 [system_monitor.py:probe():210] {'os': 'Linux-4.18.0-553.42.1.el8_10.x86_64-x86_64-with-glibc2.2.5', 'python': '3.8.17', 'heartbeatAt': '2025-03-26T19:57:19.941293', 'startedAt': '2025-03-26T19:57:18.669594', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': 'train.py', 'codePathLocal': 'train.py', 'codePath': 'train.py', 'git': {'remote': 'https://github.com/Aashrey2407/Cuffless_BP_Estimation_Diffusion_Model.git', 'commit': '212844902b8a28c8e30b27efe72681015c73ad61'}, 'email': None, 'root': '/scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model', 'host': 'hpc01.sharanga.local', 'username': 'bhanu', 'executable': '/home/bhanu/cuffless_bp/diffusion/bin/python', 'cpu_count': 32, 'cpu_count_logical': 32, 'cpu_freq': {'current': 2824.7011875000003, 'min': 1500.0, 'max': 2800.0}, 'cpu_freq_per_core': [{'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 3190.581, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 3199.857, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}, {'current': 2800.0, 'min': 1500.0, 'max': 2800.0}], 'disk': {'/': {'total': 411.029541015625, 'used': 270.9205780029297}}, 'memory': {'total': 251.2481689453125}}
+2025-03-27 01:27:19,969 INFO    HandlerThread:1943268 [system_monitor.py:probe():211] Finished collecting system info
+2025-03-27 01:27:19,969 INFO    HandlerThread:1943268 [system_monitor.py:probe():214] Publishing system info
+2025-03-27 01:27:19,969 DEBUG   HandlerThread:1943268 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2025-03-27 01:27:19,970 DEBUG   HandlerThread:1943268 [system_info.py:_save_pip():68] Saving pip packages done
+2025-03-27 01:27:19,973 INFO    HandlerThread:1943268 [system_monitor.py:probe():216] Finished publishing system info
+2025-03-27 01:27:19,977 DEBUG   SenderThread:1943268 [sender.py:send():379] send: files
+2025-03-27 01:27:19,977 INFO    SenderThread:1943268 [sender.py:_save_file():1375] saving file wandb-metadata.json with policy now
+2025-03-27 01:27:19,983 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: stop_status
+2025-03-27 01:27:19,983 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: internal_messages
+2025-03-27 01:27:19,984 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: stop_status
+2025-03-27 01:27:20,421 DEBUG   SenderThread:1943268 [sender.py:send():379] send: telemetry
+2025-03-27 01:27:20,772 DEBUG   SenderThread:1943268 [sender.py:send():379] send: exit
+2025-03-27 01:27:20,772 INFO    SenderThread:1943268 [sender.py:send_exit():584] handling exit code: 1
+2025-03-27 01:27:20,772 INFO    SenderThread:1943268 [sender.py:send_exit():586] handling runtime: 0
+2025-03-27 01:27:20,773 INFO    SenderThread:1943268 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2025-03-27 01:27:20,774 INFO    SenderThread:1943268 [sender.py:send_exit():592] send defer
+2025-03-27 01:27:20,774 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:20,774 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 0
+2025-03-27 01:27:20,774 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:20,774 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 0
+2025-03-27 01:27:20,774 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 1
+2025-03-27 01:27:20,775 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:20,775 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 1
+2025-03-27 01:27:20,775 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:20,775 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 1
+2025-03-27 01:27:20,775 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 2
+2025-03-27 01:27:20,775 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:20,775 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 2
+2025-03-27 01:27:20,775 INFO    HandlerThread:1943268 [system_monitor.py:finish():190] Stopping system monitor
+2025-03-27 01:27:20,776 DEBUG   SystemMonitor:1943268 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2025-03-27 01:27:20,776 DEBUG   SystemMonitor:1943268 [system_monitor.py:_start():166] Finished system metrics aggregation loop
+2025-03-27 01:27:20,776 INFO    HandlerThread:1943268 [interfaces.py:finish():202] Joined cpu monitor
+2025-03-27 01:27:20,776 DEBUG   SystemMonitor:1943268 [system_monitor.py:_start():170] Publishing last batch of metrics
+2025-03-27 01:27:20,777 INFO    HandlerThread:1943268 [interfaces.py:finish():202] Joined disk monitor
+2025-03-27 01:27:20,778 INFO    HandlerThread:1943268 [interfaces.py:finish():202] Joined memory monitor
+2025-03-27 01:27:20,778 INFO    HandlerThread:1943268 [interfaces.py:finish():202] Joined network monitor
+2025-03-27 01:27:20,778 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:20,778 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 2
+2025-03-27 01:27:20,778 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 3
+2025-03-27 01:27:20,778 DEBUG   SenderThread:1943268 [sender.py:send():379] send: stats
+2025-03-27 01:27:20,778 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:20,779 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 3
+2025-03-27 01:27:20,779 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:20,779 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 3
+2025-03-27 01:27:20,779 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 4
+2025-03-27 01:27:20,779 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:20,779 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 4
+2025-03-27 01:27:20,780 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:20,780 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 4
+2025-03-27 01:27:20,780 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 5
+2025-03-27 01:27:20,780 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:20,780 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 5
+2025-03-27 01:27:20,780 DEBUG   SenderThread:1943268 [sender.py:send():379] send: summary
+2025-03-27 01:27:20,782 INFO    SenderThread:1943268 [sender.py:_save_file():1375] saving file wandb-summary.json with policy end
+2025-03-27 01:27:20,782 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:20,782 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 5
+2025-03-27 01:27:20,782 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 6
+2025-03-27 01:27:20,782 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:20,782 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 6
+2025-03-27 01:27:20,782 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:20,782 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 6
+2025-03-27 01:27:20,786 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: status_report
+2025-03-27 01:27:20,794 INFO    Thread-12 :1943268 [dir_watcher.py:_on_file_created():271] file/dir created: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/requirements.txt
+2025-03-27 01:27:20,795 INFO    Thread-12 :1943268 [dir_watcher.py:_on_file_created():271] file/dir created: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/output.log
+2025-03-27 01:27:20,795 INFO    Thread-12 :1943268 [dir_watcher.py:_on_file_created():271] file/dir created: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/wandb-summary.json
+2025-03-27 01:27:20,795 INFO    Thread-12 :1943268 [dir_watcher.py:_on_file_created():271] file/dir created: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/wandb-metadata.json
+2025-03-27 01:27:21,090 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 7
+2025-03-27 01:27:21,091 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:21,091 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 7
+2025-03-27 01:27:21,091 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:21,091 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 7
+2025-03-27 01:27:21,131 INFO    wandb-upload_0:1943268 [upload_job.py:push():131] Uploaded file /tmp/tmpln1tl3eowandb/rilf7ui0-wandb-metadata.json
+2025-03-27 01:27:21,772 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-27 01:27:21,795 INFO    Thread-12 :1943268 [dir_watcher.py:_on_file_modified():288] file/dir modified: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/config.yaml
+2025-03-27 01:27:22,739 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 8
+2025-03-27 01:27:22,739 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: poll_exit
+2025-03-27 01:27:22,739 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:22,740 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 8
+2025-03-27 01:27:22,740 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:22,740 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 8
+2025-03-27 01:27:22,740 INFO    SenderThread:1943268 [job_builder.py:build():281] Attempting to build job artifact
+2025-03-27 01:27:22,741 INFO    SenderThread:1943268 [job_builder.py:_get_source_type():393] is repo sourced job
+2025-03-27 01:27:22,743 INFO    SenderThread:1943268 [job_builder.py:build():369] adding wandb-job metadata file
+2025-03-27 01:27:22,773 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-27 01:27:22,795 INFO    Thread-12 :1943268 [dir_watcher.py:_on_file_modified():288] file/dir modified: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/output.log
+2025-03-27 01:27:23,202 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 9
+2025-03-27 01:27:23,203 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: poll_exit
+2025-03-27 01:27:23,203 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:23,203 DEBUG   SenderThread:1943268 [sender.py:send():379] send: artifact
+2025-03-27 01:27:23,204 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 9
+2025-03-27 01:27:23,774 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-27 01:27:26,789 INFO    wandb-upload_1:1943268 [upload_job.py:push():89] Uploaded file /home/bhanu/.local/share/wandb/artifacts/staging/tmp7yzvyrde
+2025-03-27 01:27:27,259 INFO    wandb-upload_0:1943268 [upload_job.py:push():89] Uploaded file /home/bhanu/.local/share/wandb/artifacts/staging/tmprjig2jf8
+2025-03-27 01:27:28,777 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: keepalive
+2025-03-27 01:27:29,035 INFO    SenderThread:1943268 [sender.py:send_artifact():1453] sent artifact job-https___github.com_Aashrey2407_Cuffless_BP_Estimation_Diffusion_Model.git_train.py - {'id': 'QXJ0aWZhY3Q6MTYwMDIzNTI3Mw==', 'state': 'PENDING', 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjU5MTYwMDAzNA==', 'latestArtifact': {'id': 'QXJ0aWZhY3Q6MTYwMDEwMzgyNA==', 'versionIndex': 4}}}
+2025-03-27 01:27:29,035 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:29,035 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 9
+2025-03-27 01:27:29,035 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: status_report
+2025-03-27 01:27:29,035 INFO    SenderThread:1943268 [dir_watcher.py:finish():358] shutting down directory watcher
+2025-03-27 01:27:29,798 INFO    SenderThread:1943268 [dir_watcher.py:finish():388] scan: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files
+2025-03-27 01:27:29,799 INFO    SenderThread:1943268 [dir_watcher.py:finish():402] scan save: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/config.yaml config.yaml
+2025-03-27 01:27:29,799 INFO    SenderThread:1943268 [dir_watcher.py:finish():402] scan save: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/requirements.txt requirements.txt
+2025-03-27 01:27:29,799 INFO    SenderThread:1943268 [dir_watcher.py:finish():402] scan save: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/output.log output.log
+2025-03-27 01:27:29,800 INFO    SenderThread:1943268 [dir_watcher.py:finish():402] scan save: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/wandb-summary.json wandb-summary.json
+2025-03-27 01:27:29,808 INFO    SenderThread:1943268 [dir_watcher.py:finish():402] scan save: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/wandb-metadata.json wandb-metadata.json
+2025-03-27 01:27:29,809 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 10
+2025-03-27 01:27:29,809 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: poll_exit
+2025-03-27 01:27:29,812 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:29,813 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 10
+2025-03-27 01:27:29,814 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:29,814 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 10
+2025-03-27 01:27:29,814 INFO    SenderThread:1943268 [file_pusher.py:finish():175] shutting down file pusher
+2025-03-27 01:27:30,455 INFO    wandb-upload_0:1943268 [upload_job.py:push():131] Uploaded file /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/requirements.txt
+2025-03-27 01:27:30,599 INFO    wandb-upload_1:1943268 [upload_job.py:push():131] Uploaded file /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/config.yaml
+2025-03-27 01:27:30,599 INFO    wandb-upload_2:1943268 [upload_job.py:push():131] Uploaded file /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/output.log
+2025-03-27 01:27:31,538 INFO    wandb-upload_3:1943268 [upload_job.py:push():131] Uploaded file /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/files/wandb-summary.json
+2025-03-27 01:27:31,739 INFO    Thread-11 :1943268 [sender.py:transition_state():612] send defer: 11
+2025-03-27 01:27:31,740 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:31,740 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 11
+2025-03-27 01:27:31,741 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:31,741 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 11
+2025-03-27 01:27:31,741 INFO    SenderThread:1943268 [file_pusher.py:join():181] waiting for file pusher
+2025-03-27 01:27:31,741 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 12
+2025-03-27 01:27:31,741 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:31,741 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 12
+2025-03-27 01:27:31,741 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:31,741 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 12
+2025-03-27 01:27:31,741 INFO    SenderThread:1943268 [file_stream.py:finish():594] file stream finish called
+2025-03-27 01:27:32,079 INFO    SenderThread:1943268 [file_stream.py:finish():598] file stream finish is done
+2025-03-27 01:27:32,080 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 13
+2025-03-27 01:27:32,080 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:32,080 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 13
+2025-03-27 01:27:32,081 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:32,081 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 13
+2025-03-27 01:27:32,081 INFO    SenderThread:1943268 [sender.py:transition_state():612] send defer: 14
+2025-03-27 01:27:32,081 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: defer
+2025-03-27 01:27:32,081 DEBUG   SenderThread:1943268 [sender.py:send():379] send: final
+2025-03-27 01:27:32,081 INFO    HandlerThread:1943268 [handler.py:handle_request_defer():170] handle defer: 14
+2025-03-27 01:27:32,081 DEBUG   SenderThread:1943268 [sender.py:send():379] send: footer
+2025-03-27 01:27:32,082 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: defer
+2025-03-27 01:27:32,082 INFO    SenderThread:1943268 [sender.py:send_request_defer():608] handle sender defer: 14
+2025-03-27 01:27:32,082 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: poll_exit
+2025-03-27 01:27:32,083 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: poll_exit
+2025-03-27 01:27:32,083 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: server_info
+2025-03-27 01:27:32,083 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: server_info
+2025-03-27 01:27:32,085 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: get_summary
+2025-03-27 01:27:32,086 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: sampled_history
+2025-03-27 01:27:32,087 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: internal_messages
+2025-03-27 01:27:32,087 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: job_info
+2025-03-27 01:27:32,398 DEBUG   SenderThread:1943268 [sender.py:send_request():406] send_request: job_info
+2025-03-27 01:27:32,398 INFO    MainThread:1943268 [wandb_run.py:_footer_history_summary_info():3557] rendering history
+2025-03-27 01:27:32,398 INFO    MainThread:1943268 [wandb_run.py:_footer_history_summary_info():3589] rendering summary
+2025-03-27 01:27:32,398 INFO    MainThread:1943268 [wandb_run.py:_footer_sync_info():3516] logging synced files
+2025-03-27 01:27:32,399 DEBUG   HandlerThread:1943268 [handler.py:handle_request():144] handle_request: shutdown
+2025-03-27 01:27:32,399 INFO    HandlerThread:1943268 [handler.py:finish():840] shutting down handler
+2025-03-27 01:27:33,087 INFO    WriterThread:1943268 [datastore.py:close():294] close: /scratch/bhanu/cuffless_bp/Cuffless_BP_Estimation_Diffusion_Model/wandb/run-20250327_012718-tykl5dzm/run-tykl5dzm.wandb
+2025-03-27 01:27:33,398 INFO    SenderThread:1943268 [sender.py:finish():1531] shutting down sender
+2025-03-27 01:27:33,398 INFO    SenderThread:1943268 [file_pusher.py:finish():175] shutting down file pusher
+2025-03-27 01:27:33,398 INFO    SenderThread:1943268 [file_pusher.py:join():181] waiting for file pusher

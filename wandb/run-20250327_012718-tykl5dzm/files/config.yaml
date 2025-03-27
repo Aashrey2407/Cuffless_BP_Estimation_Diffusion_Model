@@ -1,0 +1,57 @@
+wandb_version: 1
+
+n_epoch:
+  desc: null
+  value: 1000
+batch_size:
+  desc: null
+  value: 32
+nT:
+  desc: null
+  value: 10
+device:
+  desc: null
+  value: cuda
+attention_heads:
+  desc: null
+  value: 8
+cond_mask:
+  desc: null
+  value: 0.0
+alpha1:
+  desc: null
+  value: 100
+alpha2:
+  desc: null
+  value: 1
+PATH:
+  desc: null
+  value: ./
+_wandb:
+  desc: null
+  value:
+    python_version: 3.8.17
+    cli_version: 0.15.10
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1743019038.683249
+    t:
+      1:
+      - 1
+      - 5
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 53
+      - 55
+      3:
+      - 13
+      - 16
+      - 23
+      4: 3.8.17
+      5: 0.15.10
+      8:
+      - 5
