@@ -1,19 +1,9 @@
-import os
-import wfdb
-import numpy as np
 import torch
-import sklearn.preprocessing as skp
+import numpy as np
+from tqdm import tqdm
 import neurokit2 as nk
+import sklearn.preprocessing as skp
 from torch.utils.data import Dataset, DataLoader
-
-def segment_signal(signal, window_size):
-    """
-    Break a 1D signal into non-overlapping segments of length window_size.
-    """
-    n_samples = len(signal)
-    n_segments = n_samples // window_size
-    signal = signal[:n_segments * window_size]  # Trim extra samples
-    return signal.reshape(n_segments, window_size)
 
 class ECGDataset(Dataset):
     def __init__(self, ecg_data, ppg_data):
@@ -21,92 +11,43 @@ class ECGDataset(Dataset):
         self.ppg_data = ppg_data
 
     def __getitem__(self, index):
+
         ecg = self.ecg_data[index]
         ppg = self.ppg_data[index]
+        
         window_size = ecg.shape[-1]
 
-        # Clean the signals using a sampling rate of 125 Hz
-        ppg = nk.ppg_clean(ppg.reshape(window_size), sampling_rate=125)
-        ecg = nk.ecg_clean(ecg.reshape(window_size), sampling_rate=125, method="pantompkins1985")
+        ppg = nk.ppg_clean(ppg.reshape(window_size), sampling_rate=128)
+        ecg = nk.ecg_clean(ecg.reshape(window_size), sampling_rate=128, method="pantompkins1985")
+        _, info = nk.ecg_peaks(ecg, sampling_rate=128, method="pantompkins1985", correct_artifacts=True, show=False)
 
-        # Detect R-peaks in the ECG signal
-        _, info = nk.ecg_peaks(ecg, sampling_rate=125, method="pantompkins1985", correct_artifacts=True, show=False)
-        r_peaks = info["ECG_R_Peaks"]
+        # Create a numpy array for ROI regions with the same shape as ECG
+        ecg_roi_array = np.zeros_like(ecg.reshape(1, window_size))
 
-        # Compute the first derivative of the ECG signal
-        ecg_derivative = np.diff(ecg, n=1, prepend=ecg[0])
+        # Iterate through ECG R peaks and set values to 1 within the ROI regions
+        roi_size = 32
+        for peak in info["ECG_R_Peaks"]:
+            roi_start = max(0, peak - roi_size // 2)
+            roi_end = min(roi_start + roi_size, window_size)
+            ecg_roi_array[0, roi_start:roi_end] = 1
 
-        # Create a binary ROI mask for the QRS complex
-        ecg_roi_array = np.zeros(window_size)
-        for r_peak in r_peaks:
-            search_start = max(0, r_peak - 50)
-            q_candidates = np.where(np.diff(ecg_derivative[search_start:r_peak]) > 0)[0]
-            q_peak = search_start + (q_candidates[0] if len(q_candidates) > 0 else np.argmin(ecg[search_start:r_peak]))
-            search_end = min(r_peak + 50, window_size)
-            s_candidates = np.where(np.diff(ecg_derivative[r_peak:search_end]) > 0)[0]
-            s_peak = r_peak + (s_candidates[0] if len(s_candidates) > 0 else np.argmin(ecg[r_peak:search_end]))
-            ecg_roi_array[q_peak:s_peak] = 1
-
-        return (
-            ecg.reshape(1, window_size).copy(),
-            ppg.reshape(1, window_size).copy(),
-            ecg_roi_array.reshape(1, window_size).copy()
-        )
+        return ecg.reshape(1, window_size).copy(), ppg.reshape(1, window_size).copy(), ecg_roi_array.copy() #, ppg_cwt.copy()
 
     def __len__(self):
         return len(self.ecg_data)
 
-def read_physionet_record(record_dir, record_name, window_size=500):
-    """
-    Reads a PhysioNet record (without file extensions) from record_dir.
-    Assumes that the .dat and .hea files are present.
-    Returns segmented ECG (from channel 'II') and PPG (from channel 'PLETH') signals.
-    """
-    record_path = os.path.join(record_dir, record_name)
-    record = wfdb.rdrecord(record_path)
-    sig_names = record.sig_name
+    def get_datasets(DATA_PATH,window_size):
+        ecg_train = np.load(DATA_PATH + f"/ecg_train_{window_size}sec.npy",allow_pickle=True).reshape(-1,125*window_size)
+        ppg_train = np.load(DATA_PATH + f"/ppg_train_{window_size}sec.npy",allow_pickle=True).reshape(-1,125*window_size)
+        ecg_test = np.load(DATA_PATH + f"/ecg_train_{window_size}sec.npy",allow_pickle=True).reshape(-1,125*window_size)
+        ppg_test = np.load(DATA_PATH + f"/ppg_test_{window_size}sec.npy",allow_pickle=True).reshape(-1,125*window_size)
 
-    try:
-        idx_ppg = sig_names.index("PLETH")
-    except ValueError:
-        idx_ppg = None
-    try:
-        idx_ecg = sig_names.index("II")
-    except ValueError:
-        idx_ecg = None
+        ecg_train = np.nan_to_num(ecg_train.astype("float32"))
+        ppg_train = np.nan_to_num(ppg_train.astype("float32"))
+        ecg_test = np.nan_to_num(ecg_test.astype("float32"))
+        ppg_test = np.nan_to_num(ppg_test.astype("float32"))
 
-    ecg = record.p_signal[:, idx_ecg] if idx_ecg is not None else None
-    ppg = record.p_signal[:, idx_ppg] if idx_ppg is not None else None
+        dataset_train = ECGDataset(skp.minmax_scale(ecg_train,(-1,1),axis = 1),skp.minmax_scale(ppg_train,(-1,1),axis=1))
+        dataset_test = ECGDataset(skp.minmax_scale(ecg_test,(-1,1),axis=1),skp.minmax_scale(ppg_test,(-1,1),axis=1))
 
-    # Flatten and segment the signals into 4-second chunks (500 samples)
-    if ecg is not None:
-        ecg = ecg.flatten()
-        ecg = segment_signal(ecg, window_size)
-    if ppg is not None:
-        ppg = ppg.flatten()
-        ppg = segment_signal(ppg, window_size)
-    return ecg, ppg
-
-def get_datasets_physionet(data_dir, record_list, window_size=500):
-    """
-    Reads PhysioNet records from data_dir given a list of record names (without extensions)
-    and returns a single ECGDataset instance with segmented data.
-    """
-    ecg_segments = []
-    ppg_segments = []
-    for record_name in record_list:
-        ecg, ppg = read_physionet_record(data_dir, record_name, window_size)
-        if ecg is not None and ppg is not None:
-            ecg_segments.append(ecg)
-            ppg_segments.append(ppg)
-    # Concatenate segments from all records along axis 0
-    ecg_data = np.concatenate(ecg_segments, axis=0)
-    ppg_data = np.concatenate(ppg_segments, axis=0)
-    # Scale signals to range [-1, 1]
-    ecg_data = skp.minmax_scale(ecg_data, (-1, 1), axis=1)
-    ppg_data = skp.minmax_scale(ppg_data, (-1, 1), axis=1)
-    dataset = ECGDataset(ecg_data, ppg_data)
-    return dataset
-
-
-
+        return dataset_train,dataset_test
