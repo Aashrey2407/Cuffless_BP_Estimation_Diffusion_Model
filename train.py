@@ -7,6 +7,7 @@ warnings.filterwarnings("ignore")
 import numpy as np
 from model import DiffusionUNetCrossAttention, ConditionNet
 from diffusion import RDDM
+from diffusion import BP_Diffusion
 from data_pradyum import get_datasets
 import torch.nn as nn
 from metrics import *
@@ -45,6 +46,7 @@ def train_rddm(config, resume_from_epoch=800):
     cond_mask = config["cond_mask"]
     alpha1 = config["alpha1"]
     alpha2 = config["alpha2"]
+    alpha3 = config["alpha3"]
     PATH = config["PATH"]
 
     wandb.init(
@@ -63,7 +65,13 @@ def train_rddm(config, resume_from_epoch=800):
 
     dataloader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=128)
 
-    rddm = RDDM(
+    '''rddm = RDDM(
+        eps_model=DiffusionUNetCrossAttention(512, 1, device, num_heads=num_heads),
+        region_model=DiffusionUNetCrossAttention(512, 1, device, num_heads=num_heads),
+        betas=(1e-4, 0.2), 
+        n_T=nT
+    )'''
+    bp_diffusion = BP_Diffusion(
         eps_model=DiffusionUNetCrossAttention(512, 1, device, num_heads=num_heads),
         region_model=DiffusionUNetCrossAttention(512, 1, device, num_heads=num_heads),
         betas=(1e-4, 0.2), 
@@ -72,19 +80,19 @@ def train_rddm(config, resume_from_epoch=800):
 
     Conditioning_network1 = ConditionNet().to(device)
     Conditioning_network2 = ConditionNet().to(device)
-    rddm.to(device)
+    bp_diffusion.to(device)
 
     if resume_from_epoch > 0:
         print(f"Loading checkpoints from epoch {resume_from_epoch}")
-        rddm.load_state_dict(torch.load(f"{PATH}/RDDM_epoch{resume_from_epoch}.pth"))
+        bp_diffusion.load_state_dict(torch.load(f"{PATH}/BP_Diffusion_epoch{resume_from_epoch}.pth"))
         Conditioning_network1.load_state_dict(torch.load(f"{PATH}/ConditionNet1_epoch{resume_from_epoch}.pth"))
         Conditioning_network2.load_state_dict(torch.load(f"{PATH}/ConditionNet2_epoch{resume_from_epoch}.pth"))
 
 
 
-    optim = torch.optim.AdamW([*rddm.parameters(), *Conditioning_network1.parameters(), *Conditioning_network2.parameters()], lr=1e-4)
+    optim = torch.optim.AdamW([*bp_diffusion.parameters(), *Conditioning_network1.parameters(), *Conditioning_network2.parameters()], lr=1e-4)
 
-    rddm = nn.DataParallel(rddm)
+    bp_diffusion = nn.DataParallel(bp_diffusion)
     Conditioning_network1 = nn.DataParallel(Conditioning_network1)
     Conditioning_network2 = nn.DataParallel(Conditioning_network2)
 
@@ -94,7 +102,7 @@ def train_rddm(config, resume_from_epoch=800):
     for i in range(0,n_epoch):
         print(f"\n****************** Epoch - {i} *******************\n\n")
 
-        rddm.train()
+        bp_diffusion.train()
         Conditioning_network1.train()
         Conditioning_network2.train()
         pbar = tqdm(dataloader)
@@ -110,12 +118,19 @@ def train_rddm(config, resume_from_epoch=800):
             ppg_conditions1 = Conditioning_network1(x_ppg)
             ppg_conditions2 = Conditioning_network2(x_ppg)
 
-            ddpm_loss, region_loss = rddm(x=y_ecg, cond1=ppg_conditions1, cond2=ppg_conditions2, patch_labels=ecg_roi)
+            '''ddpm_loss, region_loss = rddm(x=y_ecg, cond1=ppg_conditions1, cond2=ppg_conditions2, patch_labels=ecg_roi)
 
             ddpm_loss = alpha1 * ddpm_loss
             region_loss = alpha2 * region_loss
             
-            loss = ddpm_loss + region_loss
+            loss = ddpm_loss + region_loss'''
+            ddpm_loss, region_loss, alignment_loss = bp_diffusion(
+                x=y_ecg, cond1=ppg_conditions1, cond2=ppg_conditions2, patch_labels=ecg_roi
+            )
+            ddpm_loss = alpha1 * ddpm_loss
+            region_loss = alpha2 * region_loss
+            alignment_loss = alpha3 * alignment_loss
+            loss = ddpm_loss + region_loss + alignment_loss
 
             loss.mean().backward()
             
@@ -124,11 +139,19 @@ def train_rddm(config, resume_from_epoch=800):
             pbar.set_description(f"loss: {loss.mean().item():.4f}")
 
             # In your training loop, after calculating losses
+            '''wandb.log({
+                "epoch": i,
+                "loss": loss.mean().item(),
+                "DDPM_loss": ddpm_loss.mean().item(),
+                "Region_loss": region_loss.mean().item(),
+                "learning_rate": scheduler.get_last_lr()[0]
+            }, step=i)'''
             wandb.log({
                 "epoch": i,
                 "loss": loss.mean().item(),
                 "DDPM_loss": ddpm_loss.mean().item(),
                 "Region_loss": region_loss.mean().item(),
+                "Alignment_loss": alignment_loss.mean().item(),
                 "learning_rate": scheduler.get_last_lr()[0]
             }, step=i)
 
@@ -141,16 +164,16 @@ def train_rddm(config, resume_from_epoch=800):
                 "epochs_remaining": n_epoch - i
             })
         if i % 80 == 0:
-            torch.save(rddm.module.state_dict(), f"{PATH}/RDDM_epoch{i}.pth")
+            torch.save(bp_diffusion.module.state_dict(), f"{PATH}/bp_diffusion_epoch{i}.pth")
             torch.save(Conditioning_network1.module.state_dict(), f"{PATH}/ConditionNet1_epoch{i}.pth")
             torch.save(Conditioning_network2.module.state_dict(), f"{PATH}/ConditionNet2_epoch{i}.pth")
-            wandb.save(f"{PATH}/RDDM_epoch{i}.pth")
+            wandb.save(f"{PATH}/bp_diffusion_epoch{i}.pth")
             wandb.log({"checkpoint_epoch": i})
 
                 
 if __name__ == "__main__":
 
-    config = {
+    '''config = {
         "n_epoch": 1000,
         "batch_size":2,
         "nT":10,
@@ -159,6 +182,18 @@ if __name__ == "__main__":
         "cond_mask": 0.0,
         "alpha1": 100,
         "alpha2": 1,
+        "PATH": "./"
+    }'''
+    config = {
+        "n_epoch": 1000,
+        "batch_size": 2,
+        "nT": 10,
+        "device": "cuda",
+        "attention_heads": 8,
+        "cond_mask": 0.0,
+        "alpha1": 100,
+        "alpha2": 1,
+        "alpha3": 1,  # New weight for alignment loss
         "PATH": "./"
     }
 
