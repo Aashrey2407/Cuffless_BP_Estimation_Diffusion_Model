@@ -276,8 +276,8 @@ class BP_Diffusion(nn.Module):
             L_scale = L_position + L_amplitude
             alignment_loss = L_scale + L_freq
 
-            # Return the three losses
-            return ddpm_loss, region_loss, alignment_loss
+            generated_ecg = self.forward(x=x, cond1=cond1, cond2=cond2, mode="sample", patch_labels=patch_labels, window_size=window_size)
+            return ddpm_loss, region_loss, alignment_loss, generated_ecg
 
         elif mode == "sample":
             n_sample = cond1["down_conditions"][-1].shape[0]

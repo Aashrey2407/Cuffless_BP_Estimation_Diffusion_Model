@@ -13,6 +13,7 @@ import torch.nn as nn
 from metrics import *
 from lr_scheduler import CosineAnnealingLRWarmup
 from torch.utils.data import Dataset, DataLoader
+from model import BP_Estimator
 
 import os
 # Configure PyTorch memory management
@@ -47,6 +48,7 @@ def train_rddm(config, resume_from_epoch=800):
     alpha1 = config["alpha1"]
     alpha2 = config["alpha2"]
     alpha3 = config["alpha3"]
+    alpha4 = config["alpha4"]
     PATH = config["PATH"]
 
     wandb.init(
@@ -77,6 +79,8 @@ def train_rddm(config, resume_from_epoch=800):
         betas=(1e-4, 0.2), 
         n_T=nT
     )
+    bp_criterion = nn.MSELoss()
+    bp_estimator = BP_Estimator().to(device)
 
     Conditioning_network1 = ConditionNet().to(device)
     Conditioning_network2 = ConditionNet().to(device)
@@ -90,7 +94,7 @@ def train_rddm(config, resume_from_epoch=800):
 
 
 
-    optim = torch.optim.AdamW([*bp_diffusion.parameters(), *Conditioning_network1.parameters(), *Conditioning_network2.parameters()], lr=1e-4)
+    optim = torch.optim.AdamW([*bp_diffusion.parameters(), *Conditioning_network1.parameters(), *Conditioning_network2.parameters(), *bp_estimator.parameters()], lr=1e-4)
 
     bp_diffusion = nn.DataParallel(bp_diffusion)
     Conditioning_network1 = nn.DataParallel(Conditioning_network1)
@@ -107,7 +111,7 @@ def train_rddm(config, resume_from_epoch=800):
         Conditioning_network2.train()
         pbar = tqdm(dataloader)
 
-        for y_ecg, x_ppg, ecg_roi in pbar:
+        for y_ecg, x_ppg, ecg_roi,bp in pbar:
             
             ## Train Diffusion
             optim.zero_grad()
@@ -124,13 +128,17 @@ def train_rddm(config, resume_from_epoch=800):
             region_loss = alpha2 * region_loss
             
             loss = ddpm_loss + region_loss'''
-            ddpm_loss, region_loss, alignment_loss = bp_diffusion(
+            ddpm_loss, region_loss, alignment_loss,generated_ecg = bp_diffusion(
                 x=y_ecg, cond1=ppg_conditions1, cond2=ppg_conditions2, patch_labels=ecg_roi
             )
+            bp_pred = bp_estimator(generated_ecg, x_ppg)
+            bp_loss = bp_criterion(bp_pred, bp.to(device))
+
             ddpm_loss = alpha1 * ddpm_loss
             region_loss = alpha2 * region_loss
             alignment_loss = alpha3 * alignment_loss
-            loss = ddpm_loss + region_loss + alignment_loss
+            bp_loss = alpha4 * bp_loss
+            loss = ddpm_loss + region_loss + alignment_loss + bp_loss
 
             loss.mean().backward()
             
@@ -152,6 +160,7 @@ def train_rddm(config, resume_from_epoch=800):
                 "DDPM_loss": ddpm_loss.mean().item(),
                 "Region_loss": region_loss.mean().item(),
                 "Alignment_loss": alignment_loss.mean().item(),
+                "BP_loss": bp_loss.mean().item(),
                 "learning_rate": scheduler.get_last_lr()[0]
             }, step=i)
 
@@ -194,6 +203,7 @@ if __name__ == "__main__":
         "alpha1": 100,
         "alpha2": 1,
         "alpha3": 1,  # New weight for alignment loss
+        "alpha4": 1,  # New weight for BP loss
         "PATH": "./"
     }
 
