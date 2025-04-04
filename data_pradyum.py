@@ -118,6 +118,9 @@ def get_datasets(DATA_PATH, window_size):
     ppg_train = np.load(DATA_PATH + f"/ppg_train_{window_size}sec.npy", allow_pickle=True).reshape(-1, 125*window_size)
     ecg_test = np.load(DATA_PATH + f"/ecg_test_{window_size}sec.npy", allow_pickle=True).reshape(-1, 125*window_size)
     ppg_test = np.load(DATA_PATH + f"/ppg_test_{window_size}sec.npy", allow_pickle=True).reshape(-1, 125*window_size)
+
+    ecg_train = -ecg_train
+    ecg_test = -ecg_test
     
     # Load BP data
     bp_train = np.load(DATA_PATH + f"/bp_train_{window_size}sec.npy", allow_pickle=True)
