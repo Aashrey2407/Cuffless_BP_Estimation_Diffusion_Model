@@ -215,7 +215,7 @@ class BP_Diffusion(nn.Module):
         masked_noise = random_noise * mask.float()
         return masked_noise, random_noise
 
-    def forward(self, x=None, cond1=None, cond2=None, mode="train", patch_labels=None, window_size=128*4):
+    def forward(self, x=None, cond1=None, cond2=None, mode="train", patch_labels=None, window_size=128*10):
         if mode == "train":
             _ts = torch.randint(1, self.n_T, (x.shape[0],)).to(x.device)
 
