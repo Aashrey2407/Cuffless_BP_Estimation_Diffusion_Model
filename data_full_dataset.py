@@ -123,7 +123,7 @@ def get_dataset_from_parquet(parquet_path, window_size):
 # Example usage (for testing)
 # -------------------------------
 if __name__ == "__main__":
-    parquet_file = "dataset/Train_Processed.parquet"  # Path to your combined training dataset
+    parquet_file = "/scratch/ssdan/Cuffless-Blood-Pressure/dataset/Train_Processed.parquet"  # Path to your combined training dataset
     window_size = 10  # Adjust according to the window duration of your signals
 
     dataset = get_dataset_from_parquet(parquet_file, window_size)
