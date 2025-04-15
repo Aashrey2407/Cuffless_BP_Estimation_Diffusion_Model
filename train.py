@@ -176,6 +176,7 @@ def train_rddm(config, resume_from_epoch=800):
             torch.save(bp_diffusion.module.state_dict(), f"{PATH}/bp_diffusion_epoch{i}.pth")
             torch.save(Conditioning_network1.module.state_dict(), f"{PATH}/ConditionNet1_epoch{i}.pth")
             torch.save(Conditioning_network2.module.state_dict(), f"{PATH}/ConditionNet2_epoch{i}.pth")
+            torch.save(bp_estimator.module.state_dict(), f"{PATH}/BP_Estimator_epoch{i}.pth")
             wandb.save(f"{PATH}/bp_diffusion_epoch{i}.pth")
             wandb.log({"checkpoint_epoch": i})
 
