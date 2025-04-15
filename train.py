@@ -8,7 +8,7 @@ import numpy as np
 from model import DiffusionUNetCrossAttention, ConditionNet
 from diffusion import RDDM
 from diffusion import BP_Diffusion
-from data_pradyum import get_datasets
+from data_full_dataset import get_datasets
 import torch.nn as nn
 from metrics import *
 from lr_scheduler import CosineAnnealingLRWarmup
@@ -54,16 +54,13 @@ def train_rddm(config, resume_from_epoch=800):
     wandb.init(
         project="Cuffless_BP",
         name=f"RDDM_training_resumed_from_epoch_{resume_from_epoch}",
-        entity="switchblade-bits-pilani",
+        entity="aashreyrachaputi-bits-pilani",
         id=None,
         resume="allow",  # This allows resuming if the run ID already exists
         config=config
     )
 
-    dataset_train, dataset_test = get_datasets(
-    DATA_PATH="./preprocessed_mimic",  # Path where preprocessed_mimic directory is located
-    window_size=10
-)
+    dataset_train, _ = get_datasets(window_size=10)
 
     dataloader = DataLoader(dataset_train, batch_size=batch_size, shuffle=True, num_workers=128)
 
@@ -172,11 +169,15 @@ def train_rddm(config, resume_from_epoch=800):
                 "epoch_completed": i,
                 "epochs_remaining": n_epoch - i
             })
-        if i % 80 == 0:
+        if i % 10 == 0:
             torch.save(bp_diffusion.module.state_dict(), f"{PATH}/bp_diffusion_epoch{i}.pth")
             torch.save(Conditioning_network1.module.state_dict(), f"{PATH}/ConditionNet1_epoch{i}.pth")
             torch.save(Conditioning_network2.module.state_dict(), f"{PATH}/ConditionNet2_epoch{i}.pth")
+            torch.save(bp_estimator.module.state_dict(), f"{PATH}/bp_estimator_epoch{i}.pth")
             wandb.save(f"{PATH}/bp_diffusion_epoch{i}.pth")
+            wandb.save(f"{PATH}/ConditionNet1_epoch{i}.pth")
+            wandb.save(f"{PATH}/ConditionNet2_epoch{i}.pth")
+            wandb.save(f"{PATH}/bp_estimator_epoch{i}.pth")
             wandb.log({"checkpoint_epoch": i})
 
                 
@@ -204,7 +205,7 @@ if __name__ == "__main__":
         "alpha2": 1,
         "alpha3": 1,  # New weight for alignment loss
         "alpha4": 1,  # New weight for BP loss
-        "PATH": "./"
+        "PATH": "./checkpoints/"
     }
 
     train_rddm(config, resume_from_epoch=0)

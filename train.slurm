@@ -10,14 +10,14 @@
 # Load your environment
 spack load python@3.9.13%gcc@8.5.0
 python --version
-source /scratch/bhanu/cuffless_bp/diffu/bin/activate
+# source /scratch/bhanu/cuffless_bp/diffu/bin/activate
 python --version
 # Optional: use offline mode if WANDB fails to connect
 # export WANDB_MODE=offline
 pwd
 nvidia-smi
 # Navigate to your project directory
-cd 
+cd /home/ssdan/cuffless_BP_prediction/aashrey/Cuffless_BP_Estimation_Diffusion_Model/
 
 ulimit -n 2048
 # Run your script
