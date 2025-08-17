@@ -467,6 +467,37 @@ class ConditionNet(nn.Module):
             "up_conditions": [u1, u2, u3, u4, u5],
         }
 
+class BP_Estimator(nn.Module):
+    def __init__(self, input_channels=2, hidden_size=64, num_layers=2, dropout=0.2):
+        super(BP_Estimator, self).__init__()
+        # input_channels: For example, 2 if you concatenate generated ECG and PPG.
+        self.bilstm = nn.LSTM(
+            input_size=input_channels,
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            batch_first=True,
+            bidirectional=True,
+            dropout=dropout
+        )
+        # The output from a bidirectional LSTM is hidden_size*2 per time step.
+        self.fc = nn.Linear(hidden_size * 2, 2)  # Output layer for SBP and DBP
+
+    def forward(self, gen_ecg, ppg):
+        # Assume gen_ecg and ppg have shape: (batch, 1, sequence_length)
+        # Concatenate along channel dimension to get shape (batch, 2, sequence_length)
+        x = torch.cat([gen_ecg, ppg], dim=1)
+        # LSTM expects input shape (batch, sequence_length, features), so transpose:
+        x = x.transpose(1, 2)  # Now shape: (batch, sequence_length, 2)
+        
+        # Pass through BiLSTM
+        out, _ = self.bilstm(x)  # out shape: (batch, sequence_length, hidden_size*2)
+        # Aggregate features over time. Here we use mean pooling:
+        out = out.mean(dim=1)  # shape: (batch, hidden_size*2)
+        # Map to BP values (SBP, DBP)
+        bp = self.fc(out)  # shape: (batch, 2)
+        return bp
+
+
 if __name__ == "__main__":
 
     device = "cuda:0"
