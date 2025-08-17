@@ -47,7 +47,7 @@ def get_datasets(DATA_PATH, window_size):
     bp_train = np.load(DATA_PATH + f"/bp_train_{window_size}sec.npy", allow_pickle=True)
     bp_test = np.load(DATA_PATH + f"/bp_test_{window_size}sec.npy", allow_pickle=True)
     
-    padding_size = 30
+    padding_size = 12
     ecg_train = np.pad(ecg_train, ((0, 0), (0, padding_size)), mode='constant')
     ppg_train = np.pad(ppg_train, ((0, 0), (0, padding_size)), mode='constant')
     ecg_test = np.pad(ecg_test, ((0, 0), (0, padding_size)), mode='constant')
@@ -119,14 +119,14 @@ def get_datasets(DATA_PATH, window_size):
     ecg_test = np.load(DATA_PATH + f"/ecg_test_{window_size}sec.npy", allow_pickle=True).reshape(-1, 125*window_size)
     ppg_test = np.load(DATA_PATH + f"/ppg_test_{window_size}sec.npy", allow_pickle=True).reshape(-1, 125*window_size)
 
-    ecg_train = -ecg_train
-    ecg_test = -ecg_test
+   # ecg_train = -ecg_train
+   # ecg_test = -ecg_test
     
     # Load BP data
     bp_train = np.load(DATA_PATH + f"/bp_train_{window_size}sec.npy", allow_pickle=True)
     bp_test = np.load(DATA_PATH + f"/bp_test_{window_size}sec.npy", allow_pickle=True)
     
-    padding_size = 30
+    padding_size = 12
     ecg_train = np.pad(ecg_train, ((0, 0), (0, padding_size)), mode='constant')
     ppg_train = np.pad(ppg_train, ((0, 0), (0, padding_size)), mode='constant')
     ecg_test = np.pad(ecg_test, ((0, 0), (0, padding_size)), mode='constant')
@@ -151,4 +151,3 @@ def get_datasets(DATA_PATH, window_size):
     )
 
     return dataset_train, dataset_test
-
